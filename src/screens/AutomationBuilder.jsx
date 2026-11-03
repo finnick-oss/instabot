@@ -138,7 +138,7 @@ const STEP_CONTENT = {
   ),
 }
 
-export default function AutomationBuilder({ initialConfig, posts, onBack, onSaved, onPrivacy }) {
+export default function AutomationBuilder({ initialConfig, posts, onSyncPosts, onBack, onSaved, onPrivacy }) {
   const [config, setConfig] = useState(initialConfig)
   const [activeStep, setActiveStep] = useState('trigger')
   const [saving, setSaving] = useState(false)
@@ -153,7 +153,7 @@ export default function AutomationBuilder({ initialConfig, posts, onBack, onSave
     if (e) e.preventDefault()
     setSaving(true)
     setSaveStatus(null)
-    const result = await api.saveConfig(config)
+    const result = await api.saveAutomation(config)
     setSaving(false)
     if (result.success) {
       setSaveStatus('success')
@@ -167,7 +167,7 @@ export default function AutomationBuilder({ initialConfig, posts, onBack, onSave
 
   const handleSync = async () => {
     setSyncing(true)
-    await api.syncPosts()
+    await onSyncPosts()
     setSyncing(false)
   }
 

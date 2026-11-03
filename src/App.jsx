@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import Dashboard from './screens/Dashboard'
 import AutomationBuilder from './screens/AutomationBuilder'
 import PrivacyPolicy from './screens/PrivacyPolicy'
-import { api } from './lib/api'
+import Login from './screens/Login'
+import { api, setSession, hasSession } from './lib/api'
 
 export const DEFAULT_CONFIG = {
   id: null,
@@ -31,20 +32,73 @@ export const DEFAULT_CONFIG = {
   admin_value_enabled: true,
 }
 
+// Pick up #session=… / #auth_error=… that the backend appends after Facebook login
+function consumeAuthFragment() {
+  const params = new URLSearchParams(window.location.hash.slice(1))
+  const session = params.get('session')
+  const error = params.get('auth_error')
+  if (session || error) window.history.replaceState(null, '', window.location.pathname + window.location.search)
+  if (session) setSession(session)
+  return error
+}
+
+const EMPTY_STATS = { comments_replied: 0, dms_sent: 0, clicks: 0, followers_gained: 0, emails_saved: 0 }
+
 export default function App() {
+  const [authError, setAuthError] = useState(consumeAuthFragment)
+  const [account, setAccount] = useState(null)
+  const [authChecked, setAuthChecked] = useState(!hasSession())
   const [screen, setScreen] = useState('dashboard')
   const [editingConfig, setEditingConfig] = useState(null)
   const [automations, setAutomations] = useState([])
-  const [stats, setStats] = useState({ comments_replied: 0, dms_sent: 0, clicks: 0, followers_gained: 0, emails_saved: 0 })
+  const [stats, setStats] = useState(EMPTY_STATS)
   const [posts, setPosts] = useState([])
+  const [webhook, setWebhook] = useState(null)
+
+  const signOut = useCallback(() => {
+    setAccount(null)
+    setAutomations([])
+    setStats(EMPTY_STATS)
+    setPosts([])
+    setWebhook(null)
+    setScreen('dashboard')
+  }, [])
 
   useEffect(() => {
+    api.onUnauthorized(() => {
+      signOut()
+      setAuthError('Your session expired. Please connect again.')
+    })
+    if (!hasSession()) return
+    api.me()
+      .then(me => { setAccount(me); setAuthError(null) })
+      .catch(() => {})
+      .finally(() => setAuthChecked(true))
+  }, [signOut])
+
+  useEffect(() => {
+    if (!account) return
     api.fetchStats().then(setStats)
     api.fetchPosts().then(setPosts)
-    api.fetchConfig().then(saved => {
-      if (saved && saved.name) setAutomations([{ ...saved, id: saved.id || '1' }])
-    })
-  }, [])
+    api.fetchAutomations().then(setAutomations)
+    api.accountStatus().then(status => setWebhook(status?.webhook || null))
+  }, [account])
+
+  const handleLogout = async () => {
+    await api.logout()
+    signOut()
+  }
+
+  const handleResubscribe = async () => {
+    await api.resubscribe()
+    const status = await api.accountStatus()
+    setWebhook(status?.webhook || null)
+  }
+
+  const handleSyncPosts = async () => {
+    const result = await api.syncPosts()
+    if (result?.posts) setPosts(result.posts)
+  }
 
   const openCreate = () => {
     setEditingConfig({ ...DEFAULT_CONFIG, id: Date.now().toString() })
@@ -64,18 +118,23 @@ export default function App() {
     api.fetchStats().then(setStats)
   }
 
-  const handleDelete = (id) => setAutomations(prev => prev.filter(a => a.id !== id))
+  const handleDelete = async (id) => {
+    const result = await api.deleteAutomation(id)
+    if (result.success) setAutomations(prev => prev.filter(a => a.id !== id))
+  }
 
   const handleToggleActive = async (automation) => {
     const updated = { ...automation, active: !automation.active }
-    await api.saveConfig(updated)
-    setAutomations(prev => prev.map(a => a.id === automation.id ? updated : a))
+    const result = await api.saveAutomation(updated)
+    if (result.success) setAutomations(prev => prev.map(a => a.id === automation.id ? updated : a))
   }
 
-  const variants = {
-    initial: (dir) => ({ opacity: 0, x: dir > 0 ? 40 : -40 }),
-    animate: { opacity: 1, x: 0 },
-    exit: (dir) => ({ opacity: 0, x: dir > 0 ? -40 : 40 }),
+  if (!authChecked) return <div style={{ minHeight: '100vh', background: '#080808' }} />
+
+  if (!account) {
+    return screen === 'privacy'
+      ? <PrivacyPolicy onBack={() => setScreen('dashboard')} />
+      : <Login error={authError} onPrivacy={() => setScreen('privacy')} />
   }
 
   return (
@@ -84,12 +143,16 @@ export default function App() {
         {screen === 'dashboard' && (
           <motion.div key="dashboard" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
             <Dashboard
+              account={account}
+              webhook={webhook}
               automations={automations}
               stats={stats}
               onCreateNew={openCreate}
               onEdit={openEdit}
               onDelete={handleDelete}
               onToggleActive={handleToggleActive}
+              onLogout={handleLogout}
+              onResubscribe={handleResubscribe}
               onPrivacy={() => setScreen('privacy')}
             />
           </motion.div>
@@ -99,6 +162,7 @@ export default function App() {
             <AutomationBuilder
               initialConfig={editingConfig}
               posts={posts}
+              onSyncPosts={handleSyncPosts}
               onBack={() => setScreen('dashboard')}
               onSaved={handleSaved}
               onPrivacy={() => setScreen('privacy')}

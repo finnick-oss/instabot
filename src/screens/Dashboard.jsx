@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react'
-import { Plus, MessageCircle, Send, MousePointerClick, UserPlus, Mail, Zap, Trash2, Edit3, Activity } from 'lucide-react'
+import { Plus, MessageCircle, Send, MousePointerClick, UserPlus, Mail, Zap, Trash2, Edit3, Activity, LogOut, AlertTriangle, RefreshCw } from 'lucide-react'
+import { useState } from 'react'
 import Footer from '../components/Footer'
 
 const STAT_CARDS = [
@@ -194,7 +195,57 @@ function AutomationCard({ automation, onEdit, onDelete, onToggle, index }) {
   )
 }
 
-export default function Dashboard({ automations, stats, onCreateNew, onEdit, onDelete, onToggleActive, onPrivacy }) {
+function AccountChip({ account, onLogout }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 4px 4px 6px', borderRadius: 20, border: '1px solid #1e1e1e', background: '#0f0f0f' }}>
+      {account.avatar
+        ? <img src={account.avatar} alt="" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }} />
+        : <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#1e1e1e' }} />}
+      <span style={{ fontSize: 12, color: '#aaa', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>@{account.username}</span>
+      <button
+        type="button"
+        onClick={onLogout}
+        title="Sign out"
+        aria-label="Sign out"
+        style={{ width: 26, height: 26, borderRadius: '50%', border: 'none', background: 'transparent', color: '#555', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
+        <LogOut size={13} />
+      </button>
+    </div>
+  )
+}
+
+function WebhookBanner({ webhook, onResubscribe }) {
+  const [retrying, setRetrying] = useState(false)
+  if (!webhook || webhook.subscribed !== false) return null
+  const retry = async () => {
+    setRetrying(true)
+    await onResubscribe()
+    setRetrying(false)
+  }
+  return (
+    <div role="alert" style={{
+      display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+      padding: '14px 18px', borderRadius: 14, marginBottom: 24,
+      background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)'
+    }}>
+      <AlertTriangle size={16} color="#f59e0b" style={{ flexShrink: 0 }} />
+      <span style={{ fontSize: 13, color: '#fbbf24', flex: 1, minWidth: 200 }}>
+        Instagram isn't sending this account's comments to InstaBot yet, so automations won't fire.
+      </span>
+      <button
+        type="button"
+        onClick={retry}
+        disabled={retrying}
+        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(245,158,11,0.35)', background: 'transparent', color: '#fbbf24', fontSize: 12, cursor: 'pointer' }}
+      >
+        <RefreshCw size={12} /> {retrying ? 'Retrying…' : 'Reconnect'}
+      </button>
+    </div>
+  )
+}
+
+export default function Dashboard({ account, webhook, automations, stats, onCreateNew, onEdit, onDelete, onToggleActive, onLogout, onResubscribe, onPrivacy }) {
   const activeCount = automations.filter(a => a.active).length
 
   return (
@@ -250,10 +301,12 @@ export default function Dashboard({ automations, stats, onCreateNew, onEdit, onD
           >
             <Plus size={15} /> Create Auto DM
           </motion.button>
+          {account && <AccountChip account={account} onLogout={onLogout} />}
         </div>
       </header>
 
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '36px 32px', flex: 1, width: '100%' }}>
+        <WebhookBanner webhook={webhook} onResubscribe={onResubscribe} />
 
         {/* Page title */}
         <motion.div
