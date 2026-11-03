@@ -38,36 +38,36 @@ export default function PrivacyPolicy({ onBack }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
         >
-          <p style={{ fontSize: 12, color: '#444', marginBottom: 40 }}>Last updated: May 26, 2026</p>
+          <p style={{ fontSize: 12, color: '#444', marginBottom: 40 }}>Last updated: November 4, 2026</p>
 
           {[
             {
-              title: '1. Information We Collect',
-              body: 'InstaBot collects Instagram user IDs, usernames, and comment text from users who interact with posts where this automation is active. This data is used solely to send automated replies and direct messages on behalf of the account owner.',
+              title: '1. Who We Are',
+              body: 'InstaBot lets owners of Instagram professional accounts automatically reply to comments on their posts and send the commenter a direct message (for example a link they asked for). Account owners connect their own Instagram account with Facebook Login and choose which posts and keywords trigger a reply.',
             },
             {
-              title: '2. How We Use Your Information',
-              body: 'Data collected is used exclusively to: (a) send public comment replies, (b) send direct messages as configured by the account owner, and (c) verify follow status on Instagram. We do not sell, share, or transfer any personal data to third parties.',
+              title: '2. Information We Collect',
+              body: 'From account owners: Instagram account ID, username, name and profile picture, the linked Facebook Page ID, and the Page access token Meta issues when they connect. From people who comment on a connected owner\'s posts: their Instagram-scoped user ID, username, the comment text, and their replies or button taps in the resulting direct message conversation. We also check whether that person follows the account, only when the owner turns on the "follow to unlock" option.',
             },
             {
-              title: '3. Data Storage',
-              body: 'Interaction logs are stored locally on the account owner\'s device in a JSON file. No data is sent to external servers beyond the Instagram Graph API. Logs are limited to the 500 most recent interactions and can be cleared at any time.',
+              title: '3. How We Use It',
+              body: 'Solely to run the automations the account owner sets up: posting the public comment reply, sending the direct messages, checking follow status, and showing the owner a log and simple statistics of these interactions. We do not use the data for advertising, do not build profiles, and do not sell, rent or share it with third parties.',
             },
             {
-              title: '4. Instagram API Usage',
-              body: 'This application uses the Instagram Graph API and Meta Webhooks in accordance with Meta\'s Platform Terms. User data accessed via the API is used only for the functionality described in this policy.',
+              title: '4. Storage and Security',
+              body: 'Data is stored in a managed Postgres database (Supabase) and processed by our server on Netlify. Access tokens are kept server-side only and are never shown in the browser or shared. All traffic uses HTTPS.',
             },
             {
-              title: '5. User Rights',
-              body: 'Users who have interacted with this automation may request deletion of their data by contacting the account owner (@whoanuragbhatt on Instagram). Data is not retained beyond what is necessary for automation functionality.',
+              title: '5. Retention and Deletion',
+              body: 'Account owners can delete everything at any time with "Disconnect" in the dashboard, which removes their account, automations, interaction logs and tokens and unsubscribes our app from their Page. Removing InstaBot in Facebook or Instagram settings triggers the same deletion through Meta\'s data deletion callback. People who commented can ask the account owner, or contact us below, to delete their interaction records.',
             },
             {
-              title: '6. Security',
-              body: 'Access tokens and API credentials are stored locally and never transmitted to third-party services. All communication with Instagram\'s API uses HTTPS encryption.',
+              title: '6. Meta Platform',
+              body: 'InstaBot uses the Instagram Graph API, Messenger Platform for Instagram and Meta Webhooks in accordance with the Meta Platform Terms and Developer Policies. Data received from Meta is used only for the purposes described in this policy.',
             },
             {
               title: '7. Contact',
-              body: 'For any privacy concerns or data deletion requests, contact @whoanuragbhatt on Instagram or via the Meta platform.',
+              body: 'For privacy questions or deletion requests, email bhatt6046@gmail.com or message @whoanuragbhatt on Instagram.',
             },
           ].map((section, i) => (
             <motion.div

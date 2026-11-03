@@ -49,7 +49,8 @@ export default function App() {
   const [authError, setAuthError] = useState(consumeAuthFragment)
   const [account, setAccount] = useState(null)
   const [authChecked, setAuthChecked] = useState(!hasSession())
-  const [screen, setScreen] = useState('dashboard')
+  // #privacy gives the privacy policy a public URL for Meta's app settings
+  const [screen, setScreen] = useState(() => window.location.hash === '#privacy' ? 'privacy' : 'dashboard')
   const [editingConfig, setEditingConfig] = useState(null)
   const [automations, setAutomations] = useState([])
   const [stats, setStats] = useState(EMPTY_STATS)
