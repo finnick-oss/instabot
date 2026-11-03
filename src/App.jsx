@@ -37,7 +37,8 @@ function consumeAuthFragment() {
   const params = new URLSearchParams(window.location.hash.slice(1))
   const session = params.get('session')
   const error = params.get('auth_error')
-  if (session || error) window.history.replaceState(null, '', window.location.pathname + window.location.search)
+  // Netlify forwards the callback's query string (?code&state) on the redirect, so drop it too
+  if (session || error) window.history.replaceState(null, '', window.location.pathname)
   if (session) setSession(session)
   return error
 }
