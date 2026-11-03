@@ -153,11 +153,13 @@ export default function AutomationBuilder({ initialConfig, posts, onSyncPosts, o
     if (e) e.preventDefault()
     setSaving(true)
     setSaveStatus(null)
-    const result = await api.saveAutomation(config)
+    const activated = { ...config, active: true }
+    const result = await api.saveAutomation(activated)
     setSaving(false)
     if (result.success) {
+      setConfig(activated)
       setSaveStatus('success')
-      onSaved(config)
+      onSaved(activated)
       setTimeout(() => setSaveStatus(null), 2500)
     } else {
       setSaveStatus('error')
