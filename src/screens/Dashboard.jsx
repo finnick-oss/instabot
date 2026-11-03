@@ -217,7 +217,7 @@ function AccountChip({ account, onLogout }) {
 
 function WebhookBanner({ webhook, onResubscribe }) {
   const [retrying, setRetrying] = useState(false)
-  if (!webhook || webhook.subscribed !== false) return null
+  if (!webhook || webhook.subscribed === true) return null
   const retry = async () => {
     setRetrying(true)
     await onResubscribe()
@@ -231,7 +231,10 @@ function WebhookBanner({ webhook, onResubscribe }) {
     }}>
       <AlertTriangle size={16} color="#f59e0b" style={{ flexShrink: 0 }} />
       <span style={{ fontSize: 13, color: '#fbbf24', flex: 1, minWidth: 200 }}>
-        Instagram isn't sending this account's comments to InstaBot yet, so automations won't fire.
+        {webhook.subscribed === false
+          ? "Instagram isn't sending this account's comments to InstaBot yet, so automations won't fire."
+          : "Couldn't confirm that Instagram is sending this account's comments to InstaBot, so automations may not fire."}
+        {webhook.error && <span style={{ display: 'block', marginTop: 4, fontSize: 12, color: '#a16207' }}>{webhook.error}</span>}
       </span>
       <button
         type="button"

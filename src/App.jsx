@@ -91,9 +91,10 @@ export default function App() {
   }
 
   const handleResubscribe = async () => {
-    await api.resubscribe()
+    const result = await api.resubscribe()
     const status = await api.accountStatus()
-    setWebhook(status?.webhook || null)
+    const webhook = status?.webhook || { subscribed: null }
+    setWebhook(webhook.subscribed || result?.ok ? webhook : { ...webhook, error: result?.error || webhook.error })
   }
 
   const handleSyncPosts = async () => {
