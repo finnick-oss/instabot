@@ -43,10 +43,12 @@ const errorMessage = (e) => e.response?.data?.error || e.message
 export const api = {
   onUnauthorized(handler) { onUnauthorized = handler },
 
-  // Full-page redirect to Facebook Login for Business; the backend sends the user back with #session=…
-  loginUrl() {
+  // Full-page redirect to Facebook Login for Business, or to Instagram Login with provider 'instagram';
+  // the backend sends the user back with #session=…
+  loginUrl(provider = 'facebook') {
     const returnTo = window.location.origin + window.location.pathname
-    return `${API_URL}/api/auth/login?return_to=${encodeURIComponent(returnTo)}`
+    const path = provider === 'instagram' ? '/api/auth/instagram/login' : '/api/auth/login'
+    return `${API_URL}${path}?return_to=${encodeURIComponent(returnTo)}`
   },
 
   async me() {

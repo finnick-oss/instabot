@@ -58,19 +58,31 @@ export default function Login({ error, onPrivacy }) {
           )}
 
           <motion.a
-            href={api.loginUrl()}
+            href={api.loginUrl('instagram')}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               width: '100%', padding: '12px 16px', borderRadius: 12, boxSizing: 'border-box',
-              background: '#7c3aed', color: '#fff', fontSize: 14, fontWeight: 600, textDecoration: 'none'
+              background: 'linear-gradient(135deg, #7c3aed, #ec4899)', color: '#fff', fontSize: 14, fontWeight: 600, textDecoration: 'none'
             }}
           >
-            Connect Instagram
+            Login with Instagram
+          </motion.a>
+          <motion.a
+            href={api.loginUrl('facebook')}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              width: '100%', padding: '12px 16px', borderRadius: 12, boxSizing: 'border-box', marginTop: 10,
+              background: 'transparent', border: '1px solid #2a2a2a', color: '#ccc', fontSize: 14, fontWeight: 600, textDecoration: 'none'
+            }}
+          >
+            Continue with Facebook
           </motion.a>
           <p style={{ fontSize: 12, color: '#444', marginTop: 14, lineHeight: 1.5, textAlign: 'center' }}>
-            You'll sign in with Facebook and pick the Page linked to your Instagram professional account.
+            Use your Instagram professional (Business or Creator) account. With Facebook, pick the Page linked to it.
           </p>
         </motion.div>
       </main>

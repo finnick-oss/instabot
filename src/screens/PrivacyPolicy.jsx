@@ -43,11 +43,11 @@ export default function PrivacyPolicy({ onBack }) {
           {[
             {
               title: '1. Who We Are',
-              body: 'InstaBot lets owners of Instagram professional accounts automatically reply to comments on their posts and send the commenter a direct message (for example a link they asked for). Account owners connect their own Instagram account with Facebook Login and choose which posts and keywords trigger a reply.',
+              body: 'InstaBot lets owners of Instagram professional accounts automatically reply to comments on their posts and send the commenter a direct message (for example a link they asked for). Account owners connect their own Instagram account with Instagram Login or Facebook Login and choose which posts and keywords trigger a reply.',
             },
             {
               title: '2. Information We Collect',
-              body: 'From account owners: Instagram account ID, username, name and profile picture, the linked Facebook Page ID, and the Page access token Meta issues when they connect. From people who comment on a connected owner\'s posts: their Instagram-scoped user ID, username, the comment text, and their replies or button taps in the resulting direct message conversation. We also check whether that person follows the account, only when the owner turns on the "follow to unlock" option.',
+              body: 'From account owners: Instagram account ID, username, name and profile picture, and the access token Meta issues when they connect (an Instagram token with Instagram Login, or the linked Facebook Page ID and Page token with Facebook Login). From people who comment on a connected owner\'s posts: their Instagram-scoped user ID, username, the comment text, and their replies or button taps in the resulting direct message conversation. We also check whether that person follows the account, only when the owner turns on the "follow to unlock" option.',
             },
             {
               title: '3. How We Use It',
